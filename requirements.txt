@@ -11,3 +11,6 @@ torch==1.10
 # tensorflow
 tensorflow
 tf2onnx
+
+# tools
+netron
