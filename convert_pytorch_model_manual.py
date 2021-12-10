@@ -9,7 +9,7 @@ from transformers import AutoModel, AutoTokenizer
 model = AutoModel.from_pretrained("distilbert-base-uncased")
 
 # save path
-output_path_with_file_name = "./model.onnx"
+output_path_with_file_name = "./exports/model.onnx"
 output_path_with_file_name = Path(output_path_with_file_name).absolute()
 
 # dummy input
@@ -22,9 +22,10 @@ print("input_names: ", input_names)
 print("current input shape", {name: dummy_model_input[name].shape for name in input_names})
 
 # output
-output = model(*tuple(dummy_model_input.values()))
-output_names = list(output.keys())
-print("output_names: ", output_names)
+with torch.no_grad():
+    output = model(*tuple(dummy_model_input.values()))
+    output_names = list(output.keys())
+    print("output_names: ", output_names)
 
 # opset version: List of Operators here https://github.com/onnx/onnx/blob/master/docs/Operators.md
 opset_version = 11
@@ -76,3 +77,32 @@ torch.onnx.export(
 )
 
 ################# Compare model outputs ######################
+
+import onnxruntime as ort
+
+onnx_inputs = tokenizer(sample_text, return_tensors="np")
+print(onnx_inputs)
+
+ort_session = ort.InferenceSession(output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"])
+
+print("Inputs:")
+for idx, inputs in enumerate(ort_session.get_inputs()):
+    print("idx:", idx)
+    print("   Name:", inputs.name)
+    print("   Shape:", inputs.shape)
+print("Outputs:")
+for idx, outputs in enumerate(ort_session.get_outputs()):
+    print("idx:", idx)
+    print("   Name:", outputs.name)
+    print("   Shape:", outputs.shape)
+
+
+# onnx_inputs is a userdict data is stored a .data
+onnx_outputs = ort_session.run(None, onnx_inputs.data)[0]
+import numpy as np
+
+pytorch_outputs = output[0].cpu().detach().numpy()
+
+# comapare the outputs for pytorch and onnx
+if np.allclose(onnx_outputs, pytorch_outputs, atol=1e-4):
+    print("outpus are similar")

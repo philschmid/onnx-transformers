@@ -1,4 +1,13 @@
-torch==1.10
+# transformers dependencies
 transformers==4.13.0
+
+# onnx dependencies
 onnxruntime==1.10.0
 onnx==1.10.2
+
+# torch depdendencies
+torch==1.10
+
+# tensorflow
+tensorflow
+tf2onnx
