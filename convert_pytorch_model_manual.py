@@ -1,23 +1,6 @@
 import torch
 from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
-from transformers.convert_graph_to_onnx import convert
-from transformers.models.auto import dynamic
-
-# framework = "pt"
-# model = "distilbert-base-uncased-finetuned-sst-2-english"
-# output_dir = "onnx/distilbert.onnx"
-# opset = 11
-# task = "text-classification"
-
-# convert(
-#     framework=framework,
-#     model=model,
-#     output=Path(output_dir).absolute(),
-#     opset=opset,
-#     tokenizer=model,
-#     pipeline_name=task,
-# )
 
 
 ################# Required variables to convert to onnx ######################
@@ -91,3 +74,5 @@ torch.onnx.export(
     use_external_data_format=False,
     opset_version=opset_version,
 )
+
+################# Compare model outputs ######################
