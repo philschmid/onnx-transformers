@@ -6,14 +6,15 @@ from transformers import AutoModel, AutoTokenizer
 ################# Required variables to convert to onnx ######################
 
 # model that will be converted
-model = AutoModel.from_pretrained("distilbert-base-uncased")
+model_id = "distilbert-base-uncased"
+model = AutoModel.from_pretrained(model_id)
 
 # save path
-output_path_with_file_name = "./exports/model.onnx"
+output_path_with_file_name = "./exports/pt_model.onnx"
 output_path_with_file_name = Path(output_path_with_file_name).absolute()
 
 # dummy input
-tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+tokenizer = AutoTokenizer.from_pretrained(model_id)
 sample_text = "This is a sample sentence."
 dummy_model_input = tokenizer(sample_text, return_tensors="pt")
 
@@ -28,7 +29,7 @@ with torch.no_grad():
     print("output_names: ", output_names)
 
 # opset version: List of Operators here https://github.com/onnx/onnx/blob/master/docs/Operators.md
-opset_version = 11
+opset_version = 13
 
 # dynamic axes for inputs and outputs
 # (dict<string, dict<python:int, string>> or dict<string, list(int)>)

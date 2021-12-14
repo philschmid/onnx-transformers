@@ -2,6 +2,11 @@
 
 This repository containes experiments and examples on converting different Transformers to ONNX. 
 
+## Inspect a graph with [Netron](https://github.com/lutzroeder/Netron)
+
+```bash
+netron exports/pt_model.onnx
+```
 
 ## References & Resources
 
