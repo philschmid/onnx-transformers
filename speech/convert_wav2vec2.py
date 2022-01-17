@@ -93,23 +93,33 @@ def convert_wav2vec2_onnx(
     if optimize:
         from onnxruntime.transformers import optimizer
         from onnxruntime.transformers.fusion_options import FusionOptions
+        import onnx
 
         opt_output_path = Path(export_directory).joinpath(f"{model_name}.onnx")
 
-        optimization_options = FusionOptions("bert")
+        # optimization_options = FusionOptions("bart")
 
         # TODO: Reenable when fixed: https://github.com/microsoft/onnxruntime/issues/9573
-        optimization_options.enable_embed_layer_norm = False
+        # optimization_options.enable_embed_layer_norm = False
 
-        optimized_model = optimizer.optimize_model(
-            input=output_path_with_file_name.as_posix(),
-            model_type="bert",
+        # optimized_model = optimizer.optimize_model(
+        #     input=output_path_with_file_name.as_posix(),
+        #     model_type="bart",
+        #     num_heads=model.config.num_attention_heads,
+        #     hidden_size=model.config.hidden_size,
+        #     use_gpu=True if use_gpu else False,
+        #     opt_level=None,  # for now
+        #     optimization_options=optimization_options,
+        # )
+        onnx_model = onnx.load_model(output_path_with_file_name.as_posix())
+
+        optimized_model = optimizer.BartOnnxModel(
+            model=onnx_model,
             num_heads=model.config.num_attention_heads,
             hidden_size=model.config.hidden_size,
-            use_gpu=True if use_gpu else False,
-            opt_level=None,  # for now
-            optimization_options=optimization_options,
         )
+        optimized_model.optimize()
+        print(optimized_model.get_fused_operator_statistics())
         # convert float32 to float 16
         if use_gpu:
             optimized_model.convert_float_to_float16()
