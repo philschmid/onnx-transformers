@@ -94,7 +94,7 @@ def convert_wav2vec2_onnx(
         from onnxruntime.transformers import optimizer
         from onnxruntime.transformers.fusion_options import FusionOptions
 
-        opt_output_path = Path(export_directory).joinpath(f"{model_name}-opt.onnx")
+        opt_output_path = Path(export_directory).joinpath(f"{model_name}.onnx")
 
         optimization_options = FusionOptions("bert")
 
@@ -119,13 +119,14 @@ def convert_wav2vec2_onnx(
         print(f"optimized model saved at: {opt_output_path.absolute()}")
 
     # quantize model
-    assert not use_gpu and quantize, "quantize model only works with CPU"
+    if quantize and use_gpu:
+        raise ValueError("quantization is not supported for GPU")
     if quantize and not use_gpu:
         from onnxruntime.quantization import quantize_dynamic, QuantType
 
         model_source_path = opt_output_path if optimize else output_path_with_file_name
 
-        q8_output_path = Path(export_directory).joinpath(f"{model_name}.onnx")
+        q8_output_path = Path(export_directory).joinpath(f"{model_name}-q8.onnx")
 
         quantize_dynamic(model_source_path, q8_output_path, weight_type=QuantType.QUInt8)
         print(f"quantized model saved at: {q8_output_path.absolute()}")
