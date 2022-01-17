@@ -14,3 +14,5 @@ tf2onnx
 
 # tools
 netron
+coloredlogs
+requests

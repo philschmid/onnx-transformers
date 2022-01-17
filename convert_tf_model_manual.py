@@ -46,7 +46,10 @@ print("tf_input_spec: ", tf_input_spec)
 
 
 tf2onnx.convert.from_keras(
-    model, input_signature=tf_input_spec, opset=opset_version, output_path=output_path_with_file_name
+    model,
+    input_signature=tf_input_spec,
+    opset=opset_version,
+    output_path=output_path_with_file_name,
 )
 
 
@@ -59,7 +62,9 @@ onnx_inputs = tokenizer(sample_text, return_tensors="np")
 onnx_inputs = {k: v.astype("int32") for k, v in onnx_inputs.items()}
 
 
-ort_session = ort.InferenceSession(output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"])
+ort_session = ort.InferenceSession(
+    output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"]
+)
 
 print("Inputs:")
 for idx, inputs in enumerate(ort_session.get_inputs()):

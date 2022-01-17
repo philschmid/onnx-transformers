@@ -14,7 +14,9 @@ question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
 onnx_inputs = tokenizer(question, text, return_tensors="np")
 # change from int64 to int32
 
-ort_session = ort.InferenceSession(output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"])
+ort_session = ort.InferenceSession(
+    output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"]
+)
 onnx_outputs = ort_session.run(None, onnx_inputs.data)[:2]
 
 start_scores = np.argmax(onnx_outputs[0])
@@ -35,12 +37,19 @@ class OnnxModel:
         return self.model(*args, **kwargs)
 
 
-from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+from onnxruntime import (
+    GraphOptimizationLevel,
+    InferenceSession,
+    SessionOptions,
+    get_all_providers,
+)
 
 
 class OnnxModel:
     def __init__(self, model_path: str, provider: str):
-        assert provider in get_all_providers(), f"provider {provider} not found, {get_all_providers()}"
+        assert (
+            provider in get_all_providers()
+        ), f"provider {provider} not found, {get_all_providers()}"
         self.options = self._set_options()
         self.model = InferenceSession(model_path, self.options, providers=[provider])
         # Load the model as a graph and prepare the CPU backend
@@ -57,7 +66,9 @@ class OnnxModel:
         return options
 
 
-model = OnnxModel(output_path_with_file_name.as_posix(), provider="CPUExecutionProvider")
+model = OnnxModel(
+    output_path_with_file_name.as_posix(), provider="CPUExecutionProvider"
+)
 print(model(onnx_inputs.data))
 
 from transformers import QuestionAnsweringPipeline, Pipeline
@@ -76,7 +87,9 @@ class OptimumQuestionAnsweringPipeline(QuestionAnsweringPipeline, Pipeline):
         print(model_inputs)
         print(forward_params)
         onnx_outputs = self.model(model_inputs)
-        return QuestionAnsweringModelOutput(start_logits=onnx_outputs[0], end_logits=onnx_outputs[1])
+        return QuestionAnsweringModelOutput(
+            start_logits=onnx_outputs[0], end_logits=onnx_outputs[1]
+        )
 
 
 qa = OptimumQuestionAnsweringPipeline(model=model, tokenizer=tokenizer)

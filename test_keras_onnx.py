@@ -13,7 +13,9 @@ onnx_inputs = tokenizer(sample_text, return_tensors="np")
 onnx_inputs = {k: v.astype("int32") for k, v in onnx_inputs.items()}
 
 
-ort_session = ort.InferenceSession(output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"])
+ort_session = ort.InferenceSession(
+    output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"]
+)
 onnx_outputs = ort_session.run(None, onnx_inputs)[0]
 
 print(onnx_outputs[0].shape)

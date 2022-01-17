@@ -20,7 +20,9 @@ dummy_model_input = tokenizer(sample_text, return_tensors="pt")
 
 input_names = list(dummy_model_input.keys())
 print("input_names: ", input_names)
-print("current input shape", {name: dummy_model_input[name].shape for name in input_names})
+print(
+    "current input shape", {name: dummy_model_input[name].shape for name in input_names}
+)
 
 # output
 with torch.no_grad():
@@ -84,7 +86,9 @@ import onnxruntime as ort
 onnx_inputs = tokenizer(sample_text, return_tensors="np")
 print(onnx_inputs)
 
-ort_session = ort.InferenceSession(output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"])
+ort_session = ort.InferenceSession(
+    output_path_with_file_name.as_posix(), providers=["CPUExecutionProvider"]
+)
 
 print("Inputs:")
 for idx, inputs in enumerate(ort_session.get_inputs()):
