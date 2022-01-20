@@ -44,7 +44,7 @@ To understand what we need to change/ what we need to adjust we can copy/fork th
 
 **Step 3:** add a break points to every `return False` in our `onnx_model_wav2vec2.py`. Since if the method `check_runtime_shape_path` returns `False` the Attenion layer cannot be fused. 
 
-**Step 4:** Run Python debugger to see where it breaks and then debug. In our example we can use `optimize_wav2vec2.py`, which tries to optimizes the model. You can find a step-by-step example for it in [Debug Optimization & Graph](#debug-optimization-graph).
+**Step 4:** Run Python debugger to see where it breaks and then debug. In our example we can use `optimize_wav2vec2.py`, which tries to optimizes the model. You can find a step-by-step example for it in [Debug Optimization & Graph](#debug-optimization--graph).
 
 **Step 5:** Use it!
 
