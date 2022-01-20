@@ -42,11 +42,34 @@ To understand what we need to change/ what we need to adjust we can copy/fork th
 
 **Step 2:** start netron with the converted model to be able to inspect and search through the graph.
 
-**Step 3:** add a break point and start python debugger. In our example we set a break point in `onnx_model_wav2vec2.py` at line `def create_model(self, config, for_training=True, **kwargs):`
-DEBUG with Python debugger and netron. 
+**Step 3:** add a break points to every `return False` in our `onnx_model_wav2vec2.py`. Since if the method `check_runtime_shape_path` returns `False` the Attenion layer cannot be fused. 
 
-1. netron
+**Step 4:** Run Python debugger to see where it breaks and then debug. In our example we can use `optimize_wav2vec2.py`, which tries to optimizes the model. You can find a step-by-step example for it in [Debug Optimization & Graph](#debug-optimization-graph).
 
-2. debugger 
+**Step 5:** Use it!
 
-3. onnx_model_bart
+
+## Debug Optimization & Graph
+
+Starting the Pythong script with the Debugger and break points at every `return False` should break at the following node:
+![none_value](assets/optimize/none_value.png)
+
+The reason for this is `reshape_qkv_2_path_3` is None, which means we need to find out why it is None and not a list of inputs of the matching path. But before that a quick explanation what `check_runtime_shape_path` does. It basically runs through the model graph to check & find path which can be fused. In our breaking example we are at `Reshape_177`.
+
+![first_shape_breaking](assets/optimize/first_shape_breaking.png)
+
+We can now search for that in netron. Therefore use the search `cmd+f` and type `Reshape_177`.
+
+![netron_reshape](assets/optimize/netron_reshape.png)
+
+Next step of `check_runtime_shape_path` is to find to `concat_qkv_2_path = self.model.match_parent_path(reshape_qkv_2, ["Concat"], [1])` in our case it is `Concat_176`. Going further we see that `reshape_qkv_2_path_3` is none, which is the reason why return `False`. So lets inspect the graph and find out why. 
+
+The [match_parent_path](https://github.com/microsoft/onnxruntime/blob/001cc539683d5e294d7b306d57e5d5bbb8422d73/onnxruntime/python/tools/transformers/onnx_model.py#L310) method needs to be read backwards. For `reshape_qkv_2_path_1 = self.model.match_parent_path(concat_qkv_2, ["Unsqueeze", "Gather", "Shape"], [0, 0, 0])` This means around parent node is `concat_qkv_2` or `Concat_176` and then we go up the graph backwards so next node is `Shape` followed, by `Gather` and then `Unsqueeze`.
+
+![read_parent](assets/optimize/read_parent.png)
+
+Comparing `reshape_qkv_2_path_1`, which is `[340,338,337]` or `Unsqueeze_173`, `Gather_118` & `Shape_116` and `reshape_qkv_2_path_2`, which is `[343,341,337]` or `Unsqueeze_175`, `Gather_121` & `Shape_119` we notice there is no third path to find and match for `reshape_qkv_2_path_3`. Meaning this check is obsolete and can be removed. 
+
+After we have done this and adjusted the if followed we can re-run our python script with our break points to find the next issue. Luckly this was to only one. 
+
+After everything is done we can inspect the graph again and can see all of the operations has been fused into `Attention` operators. 

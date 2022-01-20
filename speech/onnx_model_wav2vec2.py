@@ -12,9 +12,9 @@ from onnxruntime.transformers.onnx_model_bert import BertOnnxModel
 logger = logging.getLogger(__name__)
 
 
-class FusionBartEncoderAttention(FusionAttention):
+class FusionWav2vec2EncoderAttention(FusionAttention):
     """
-    Fuse Bart Attention subgraph into one Attention node.
+    Fuse Wav2vec2 Attention subgraph into one Attention node.
     """
 
     def __init__(self, model: OnnxModel, hidden_size: int, num_heads: int, attention_mask: AttentionMask):
@@ -174,7 +174,7 @@ class FusionBartEncoderAttention(FusionAttention):
             self.prune_graph = True
 
 
-class FusionBartReshape(FusionReshape):
+class FusionWav2vec2Reshape(FusionReshape):
     def __init__(self, model: OnnxModel):
         super().__init__(model)
 
@@ -267,16 +267,18 @@ class FusionBartReshape(FusionReshape):
             self.replace_reshape_node(shape, reshape_node, concat_node)
 
 
-class BartOnnxModel(BertOnnxModel):
+class Wav2vec2OnnxModel(BertOnnxModel):
     def __init__(self, model, num_heads, hidden_size):
         super().__init__(model, num_heads, hidden_size)
         self.attention_mask = AttentionMask(self)
-        self.attention_fusion = FusionBartEncoderAttention(self, self.hidden_size, self.num_heads, self.attention_mask)
-        self.bart_reshape_fusion_preprocess = FusionBartReshape(self)
+        self.attention_fusion = FusionWav2vec2EncoderAttention(
+            self, self.hidden_size, self.num_heads, self.attention_mask
+        )
+        self.wav2vec2_reshape_fusion_preprocess = FusionWav2vec2Reshape(self)
 
     def fuse_attention(self):
         self.attention_fusion.apply()
 
     def preprocess(self):
         self.adjust_reshape_and_expand()
-        self.bart_reshape_fusion_preprocess.apply()
+        self.wav2vec2_reshape_fusion_preprocess.apply()

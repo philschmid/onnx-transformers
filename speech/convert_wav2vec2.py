@@ -91,30 +91,16 @@ def convert_wav2vec2_onnx(
 
     # graph optimization using onnxruntime
     if optimize:
-        from onnx_model_wav2vec2 import BartOnnxModel
+        from onnx_model_wav2vec2 import Wav2vec2OnnxModel
 
         from onnxruntime.transformers.fusion_options import FusionOptions
         import onnx
 
         opt_output_path = Path(export_directory).joinpath(f"{model_name}_self.onnx")
 
-        # optimization_options = FusionOptions("bart")
-
-        # TODO: Reenable when fixed: https://github.com/microsoft/onnxruntime/issues/9573
-        # optimization_options.enable_embed_layer_norm = False
-
-        # optimized_model = optimizer.optimize_model(
-        #     input=output_path_with_file_name.as_posix(),
-        #     model_type="bart",
-        #     num_heads=model.config.num_attention_heads,
-        #     hidden_size=model.config.hidden_size,
-        #     use_gpu=True if use_gpu else False,
-        #     opt_level=None,  # for now
-        #     optimization_options=optimization_options,
-        # )
         onnx_model = onnx.load_model(output_path_with_file_name.as_posix())
 
-        optimized_model = BartOnnxModel(
+        optimized_model = Wav2vec2OnnxModel(
             model=onnx_model,
             num_heads=model.config.num_attention_heads,
             hidden_size=model.config.hidden_size,

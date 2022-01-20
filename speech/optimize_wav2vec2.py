@@ -1,7 +1,7 @@
 from pathlib import Path
 from onnxruntime.transformers import optimizer
 from onnxruntime.transformers.fusion_options import FusionOptions
-from onnx_model_wav2vec2 import BartOnnxModel
+from onnx_model_wav2vec2 import Wav2vec2OnnxModel
 import onnx
 
 
@@ -10,7 +10,7 @@ hidden_size = 768
 
 export_directory = "exports"
 model_name = "wav2vec2"
-model_path = Path("speech/exports/wav2vec2.onnx")
+model_path = Path("speech/exports/wav2vec2-base-960h.onnx")
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
 
     onnx_model = onnx.load_model(model_path.as_posix())
 
-    optimized_model = BartOnnxModel(
+    optimized_model = Wav2vec2OnnxModel(
         model=onnx_model,
         num_heads=num_attention_heads,
         hidden_size=hidden_size,
