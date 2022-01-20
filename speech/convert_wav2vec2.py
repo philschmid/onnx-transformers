@@ -91,11 +91,12 @@ def convert_wav2vec2_onnx(
 
     # graph optimization using onnxruntime
     if optimize:
-        from onnxruntime.transformers import optimizer
+        from onnx_model_wav2vec2 import BartOnnxModel
+
         from onnxruntime.transformers.fusion_options import FusionOptions
         import onnx
 
-        opt_output_path = Path(export_directory).joinpath(f"{model_name}.onnx")
+        opt_output_path = Path(export_directory).joinpath(f"{model_name}_self.onnx")
 
         # optimization_options = FusionOptions("bart")
 
@@ -113,7 +114,7 @@ def convert_wav2vec2_onnx(
         # )
         onnx_model = onnx.load_model(output_path_with_file_name.as_posix())
 
-        optimized_model = optimizer.BartOnnxModel(
+        optimized_model = BartOnnxModel(
             model=onnx_model,
             num_heads=model.config.num_attention_heads,
             hidden_size=model.config.hidden_size,
@@ -163,4 +164,4 @@ def convert_wav2vec2_onnx(
 
 if __name__ == "__main__":
     model_id = "facebook/wav2vec2-base-960h"
-    convert_wav2vec2_onnx(model_id=model_id, optimize=False, quantize=False)
+    convert_wav2vec2_onnx(model_id=model_id, optimize=True, quantize=False)
