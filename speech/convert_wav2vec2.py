@@ -163,4 +163,4 @@ def convert_wav2vec2_onnx(
 
 if __name__ == "__main__":
     model_id = "facebook/wav2vec2-base-960h"
-    convert_wav2vec2_onnx(model_id=model_id, optimize=True, quantize=True)
+    convert_wav2vec2_onnx(model_id=model_id, optimize=False, quantize=False)

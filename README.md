@@ -8,6 +8,9 @@ This repository containes experiments and examples on converting different Trans
 netron exports/model.onnx
 ```
 
+netron speech/exports/wav2vec2.onnx
+
+
 a asdas
  ## References & Resources
 

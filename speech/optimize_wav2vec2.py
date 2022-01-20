@@ -8,14 +8,14 @@ import onnx
 num_attention_heads = 12
 hidden_size = 768
 
-export_directory = "../exports"
-model_name = "wave2vec2"
-model_path = Path("../exports/wave2vec2.onnx")
+export_directory = "exports"
+model_name = "wav2vec2"
+model_path = Path("speech/exports/wav2vec2.onnx")
 
 
 def main():
 
-    opt_output_path = Path(export_directory).joinpath(f"{model_name}.onnx")
+    opt_output_path = Path(export_directory).joinpath(f"{model_name}_opt.onnx")
 
     onnx_model = onnx.load_model(model_path.as_posix())
 
@@ -24,6 +24,8 @@ def main():
         num_heads=num_attention_heads,
         hidden_size=hidden_size,
     )
+
+    # Will call https://github.com/microsoft/onnxruntime/blob/e5ee0b435db9007921adeadffe929f247a5d6055/onnxruntime/python/tools/transformers/onnx_model_bert.py#L302
     optimized_model.optimize()
     print(optimized_model.get_fused_operator_statistics())
 
