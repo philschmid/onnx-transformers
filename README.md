@@ -5,10 +5,11 @@ This repository containes experiments and examples on converting different Trans
 ## Inspect a graph with [Netron](https://github.com/lutzroeder/Netron)
 
 ```bash
-netron exports/pt_model.onnx
+netron exports/model.onnx
 ```
 
-## References & Resources
+a asdas
+ ## References & Resources
 
 * [Transformers documentation](https://huggingface.co/docs/transformers/serialization)
 * [Keras/TF to onnx](https://github.com/onnx/tensorflow-onnx)
