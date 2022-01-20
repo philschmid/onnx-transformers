@@ -30,15 +30,16 @@ class FusionBartEncoderAttention(FusionAttention):
 
         reshape_qkv_2_path_1 = self.model.match_parent_path(concat_qkv_2, ["Unsqueeze", "Gather", "Shape"], [0, 0, 0])
         reshape_qkv_2_path_2 = self.model.match_parent_path(concat_qkv_2, ["Unsqueeze", "Gather", "Shape"], [1, 0, 0])
-        reshape_qkv_2_path_3 = self.model.match_parent_path(concat_qkv_2, ["Unsqueeze", "Gather", "Shape"], [2, 0, 0])
-        if reshape_qkv_2_path_1 is None or reshape_qkv_2_path_2 is None or reshape_qkv_2_path_3 is None:
+        # reshape_qkv_2_path_3 = self.model.match_parent_path(concat_qkv_2, ["Unsqueeze", "Gather", "Shape"], [1, 0, 0])
+        # if reshape_qkv_2_path_1 is None or reshape_qkv_2_path_2 is None or reshape_qkv_2_path_3 is None:
+        if reshape_qkv_2_path_1 is None or reshape_qkv_2_path_2 is None:
             return False
 
         _, gather_1, shape_1 = reshape_qkv_2_path_1
         _, gather_2, shape_2 = reshape_qkv_2_path_2
-        _, _, shape_3 = reshape_qkv_2_path_3
+        # _, _, shape_3 = reshape_qkv_2_path_3
 
-        if shape_1.input[0] != root_input or shape_2.input[0] != root_input or shape_3.input[0] != root_input:
+        if shape_1.input[0] != root_input or shape_2.input[0] != root_input:
             return False
 
         reshape_qkv_1_path_1 = self.model.match_parent_path(
