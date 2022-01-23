@@ -23,7 +23,7 @@ a asdas
 * [Tensorflow Bert example noteboob](https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/huggingface-bert.ipynb)
 * [Tensorflow2onnx transformers tests](https://github.com/onnx/tensorflow-onnx/blob/master/tests/huggingface.py)
 * [Sample Input Tensorflow](https://github.com/onnx/tensorflow-onnx/blob/72d64606d9aff4f93bb064ba901af49377266150/tests/huggingface.py#L129)
-
+* [Converting Seq2Seq model BART](https://github.com/huggingface/transformers/tree/master/examples/research_projects/onnx/summarization)
 
 # How to optimize the model architecture which isn't yet support in [MODEL_TYPES](https://github.com/microsoft/onnxruntime/blob/001cc539683d5e294d7b306d57e5d5bbb8422d73/onnxruntime/python/tools/transformers/optimizer.py#L36) provided by Microsoft and ONNX
 
